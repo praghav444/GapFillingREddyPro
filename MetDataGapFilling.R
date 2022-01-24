@@ -50,7 +50,6 @@ temp <- temp$sExportResults() #  <-------- DataFrame contains the gap-filled val
 
 vars <- c('ET','GPP','RH','Rg', 'Tair', 'VPD', 'u', 'NEE') # Variables for which you want to perform gap-filling
 temp <- sEddyProc$new('Any name', data, vars)  # To preserve original data
-# estimating the thresholds based on the ustar data
 temp$sMDSGapFill('ET', FillAll=TRUE)
 temp$sMDSGapFill('GPP', FillAll=TRUE)
 temp$sMDSGapFill('RH', FillAll=TRUE)
