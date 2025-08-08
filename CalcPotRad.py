@@ -1,5 +1,6 @@
 # Functions to calculate Potential Radiation
 import numpy as np
+import pandas as pd
 import warnings
 from timezonefinder import TimezoneFinder
 import pytz
@@ -234,8 +235,8 @@ site_info = pd.read_csv("sites_info_Fluxnet2015_ICOS_AMFFLX.csv")
 site_info['TimeZone_offset'] = np.nan
 tf = TimezoneFinder()
 for i, row in site_info.iterrows():
-    lat = row['Lat']
-    long = row['Long']
+    lat = row['lat']
+    long = row['long']
     timezone_str = tf.timezone_at(lng=long, lat=lat)
     if timezone_str:
         tz = pytz.timezone(timezone_str)
