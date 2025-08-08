@@ -260,3 +260,4 @@ now = datetime.utcnow()
 offset = tz.utcoffset(now)
 offset_hours = offset.total_seconds() / 3600
 PotRad = CalcPotRadiation(sample_ds['DoY'], sample_ds['Hour'], Lat_deg = lat, Long_deg = long, TimeZone_h=offset_hours,useSolartime=True) # Potential Radiation
+print(PotRad)
