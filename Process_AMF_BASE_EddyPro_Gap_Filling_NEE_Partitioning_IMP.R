@@ -117,7 +117,7 @@ select_columns <- function(df, prefix, preferred_contains = "PI", exclude_suffix
 #------------------------------------------------------------------------------------------------------------------------
 # Basic Settings
 setwd("/mnt/wwn-0x5000c500e5ba5923/Research_Work/2025/AGU_Chapman/AmeriFlux")
-badm.path <- "/mnt/wwn-0x5000c500e5ba5923/Research_Work/2025/AGU_Chapman/AmeriFlux/BADM"
+badm.path <- "/mnt/wwn-0x5000c500e5ba5923/Research_Work/2025/AGU_Chapman/AmeriFlux/BADM/"
 site_info <- read_csv("/mnt/wwn-0x5000c500e5ba5923/Research_Work/2025/AGU_Chapman/All_AmeriFlux_Sites_info.csv",show_col_types = FALSE)
 dir_1 <- "/mnt/wwn-0x5000c500e5ba5923/Research_Work/2025/AGU_Chapman/AmeriFlux/RAW_Data_AmeriFlux_Base"
 zip_files <- list.files(dir_1, pattern = "\\.zip$", full.names = TRUE)
@@ -239,7 +239,7 @@ process_file <- function(zip_file){
       LE_F_MDS = FilledEddyData$LE_uStar_f, LE_F_MDS_QC = FilledEddyData$LE_uStar_fqc,
       H_F_MDS = FilledEddyData$H_uStar_f, H_F_MDS_QC = FilledEddyData$H_uStar_fqc,
       NETRAD_F_MDS = FilledEddyData$NETRAD_f, NETRAD_F_MDS_QC = FilledEddyData$NETRAD_fqc,
-      G_F_MDS = df$G_f, G_F_MDS_QC = FilledEddyData$G_fqc,
+      G_F_MDS = FilledEddyData$G_f, G_F_MDS_QC = FilledEddyData$G_fqc,
       VPD_F_MDS = FilledEddyData$VPD_f, VPD_F_MDS_QC = FilledEddyData$VPD_fqc,
       Tair_F_MDS = FilledEddyData$Tair_f, Tair_F_MDS_QC = FilledEddyData$Tair_fqc,
       Pa_F_MDS = FilledEddyData$Pa_f, Pa_F_MDS_QC = FilledEddyData$Pa_fqc,
@@ -251,11 +251,13 @@ process_file <- function(zip_file){
       SW_IN_POT = FilledEddyData$PotRad_uStar, RECO = FilledEddyData$Reco_uStar,
       SWC = df$SWC
     )
-    if (length(gpp_cols) > 0){
+    if (length(gpp_cols) == 1){
+      final_df$GPP_PI <- as.numeric(df[[gpp_cols]])
+    } else if ((length(gpp_cols) > 1)){
       final_df$GPP_PI  <- rowMeans(df[, gpp_cols],  na.rm = TRUE)
-    }
+    }    
     # Save
-    write.csv(final_df, paste0("AMF_BASE_EddyPro_Processed_Data/AMF_", site_name, "_BASE.csv"))
+    write.csv(final_df, paste0("/mnt/wwn-0x5000c500e5ba5923/Research_Work/2025/AGU_Chapman/AmeriFlux/AMF_BASE_EddyPro_Processed_Data/AMF_", site_name, "_BASE.csv"), row.names = FALSE)
     return(NULL)
   }, error=function(error_message) {
     message(error_message)
@@ -263,7 +265,7 @@ process_file <- function(zip_file){
   })
 }
 # Run in parallel
-cl <- makeCluster(64)
+cl <- makeCluster(110)
 registerDoParallel(cl)
 out <- foreach(file = zip_files, .combine = rbind, .packages = c("archive", "readr", "stringr", "data.table", "REddyProc", "lubridate", "dplyr", "readxl")) %dopar% {
   process_file(file)
