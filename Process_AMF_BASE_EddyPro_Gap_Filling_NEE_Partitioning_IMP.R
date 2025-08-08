@@ -130,7 +130,8 @@ process_file <- function(zip_file){
     con <- archive::archive_read(zip_file, file = flx_file)
     df <- read_csv(con, skip = 2, show_col_types = FALSE)
     df[df == -9999] <- NA
-    df$DateTime <- strptime(df$TIMESTAMP_START, format="%Y%m%d%H%M")
+    utc_offset = get_utc_offset(site_name, badm.path)
+    df$DateTime <- as.POSIXct(as.character(df$TIMESTAMP_START),format="%Y%m%d%H%M", tz=paste0("Etc/GMT",utc_offset))
     df <- df %>% arrange(DateTime)
     rownames(df) <- NULL
     NETRAD_cols <- select_columns(df, "NETRAD")
@@ -195,8 +196,6 @@ process_file <- function(zip_file){
     } else{
       df$NEE  <- rowMeans(df[, nee_cols],  na.rm = TRUE)
     }
-    utc_offset = get_utc_offset(site_name, badm.path)
-    df$DateTime <- as.POSIXct(df$DateTime, tz=paste0("Etc/GMT",utc_offset)) 
     vars <- c('NEE', 'Rg', 'Tair', 'VPD', 'LE', 'H', 'NETRAD', 'G',  'Pa', 'WS', 'Ustar')
     site_lat <- site_info$LOCATION_LAT[site_info$SITE_ID==site_name]
     site_long <- site_info$LOCATION_LONG[site_info$SITE_ID==site_name]
@@ -213,7 +212,8 @@ process_file <- function(zip_file){
     date_end <- as.POSIXct(paste0(date(df$DateTime[nrow(df)]), time_end))
     seq_DateTime <- seq(from=date_start, by=24*60/nStepsPerDay*60, to=date_end)
     temp <- data.frame(DateTime = seq_DateTime)
-    df <- left_join(temp,df,by='DateTime')
+    temp$DateTime <- as.POSIXct(temp$DateTime, tz=paste0("Etc/GMT",utc_offset))
+    #df <- left_join(temp,df,by='DateTime')
     # Initalize R5 reference class sEddyProc for post-processing of eddy data with the variables needed later
     EProc  <- sEddyProc$new('Any name', df, vars) 
     EProc $sSetLocationInfo(LatDeg=site_lat, LongDeg=site_long, TimeZoneHour=as.numeric(utc_offset))
