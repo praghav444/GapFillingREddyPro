@@ -246,7 +246,7 @@ for i, row in site_info.iterrows():
         offset_hours = np.nan
     site_info.at[i, 'TimeZone_offset'] = offset_hours
   #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# Example to calculate Potential Radiation
+# Example calculating Potential Radiation
 sample_ds = pd.read_csv("sample_ds_AR-TF1.csv")
 sample_ds['DateTime'] = pd.to_datetime(sample_ds['DateTime'], format="mixed")
 sample_ds['DoY'] = sample_ds['DateTime'].dt.dayofyear
